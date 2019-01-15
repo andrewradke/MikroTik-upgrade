@@ -247,24 +247,18 @@ for hostname in args.hosts:
 			while time.time() < timeout:
 				pingable = os.system("fping -q " + hostname + " 2>/dev/null")
 				if pingable == 0:
-					print(hostname + " is back online. Checking status")
 					host_up = True
 					break
 				if sys.stdout.isatty():
-					print('\r{:.0f} seconds since reboot...     \r'.format(time.time() + reboot_timeout - timeout), end='', flush=True)
+					print('\r{:.0f} seconds since reboot...     '.format(time.time() + reboot_timeout - timeout), end='', flush=True)
 			if sys.stdout.isatty():
 				print('\r', end='')
 				for i in range(0,shutil.get_terminal_size().columns):
 					print(' ', end='')
 				print('\r', end='')
 
-			if args.verbose:
-				print('\r', end='')
-				for i in range(0,shutil.get_terminal_size().columns):
-					print(' ', end='')
-				print('\r', end='')
-
 			if host_up:
+				print(hostname + " is back online. Checking status")
 				reboot_time = time.time() - reboot_time
 				if args.verbose and args.verbose >= 2:
 					print("Reboot took {:.1f} seconds.".format(reboot_time))
@@ -422,7 +416,6 @@ for hostname in args.hosts:
 			while time.time() < timeout:
 				pingable = os.system("fping -q " + hostname + " 2>/dev/null")
 				if pingable == 0:
-					print(hostname + " is back online. Checking status")
 					host_up = True
 					break
 				if sys.stdout.isatty():
@@ -433,13 +426,8 @@ for hostname in args.hosts:
 					print(' ', end='')
 				print('\r', end='')
 
-			if args.verbose:
-				print('\r', end='')
-				for i in range(0,shutil.get_terminal_size().columns):
-					print(' ', end='')
-				print('\r', end='')
-
 			if host_up:
+				print(hostname + " is back online. Checking status")
 				reboot_time = time.time() - reboot_time
 				if args.verbose:
 					print("Reboot took {:.1f} seconds.".format(reboot_time))
