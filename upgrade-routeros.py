@@ -214,14 +214,15 @@ for hostname in args.hosts:
 		if os.path.isfile(filename):
 			if sys.stdout.isatty():
 				SCPClient = scp.SCPClient(SSHClient.get_transport(), progress=progress)
-				print('\r', end='')
-				for i in range(0,shutil.get_terminal_size().columns):
-					print(' ', end='')
-				print('\r', end='')
 			else:
 				SCPClient = scp.SCPClient(SSHClient.get_transport())
 			if not args.noop:
 				SCPClient.put(filename)
+				if sys.stdout.isatty():
+					print('\r', end='')
+					for i in range(0,shutil.get_terminal_size().columns):
+						print(' ', end='')
+					print('\r', end='')
 			else:
 				print(bcolors.OKBLUE + "NOOP: would upload {}".format(filename) + bcolors.ENDC)
 			if args.verbose:
@@ -244,7 +245,7 @@ for hostname in args.hosts:
 			host_up = False
 			timeout = time.time() + reboot_timeout
 			while time.time() < timeout:
-				pingable = os.system("fping -q " + hostname)
+				pingable = os.system("fping -q " + hostname + "2>/dev/null")
 				if pingable == 0:
 					print(hostname + " is back online. Checking status")
 					host_up = True
@@ -414,7 +415,7 @@ for hostname in args.hosts:
 			host_up = False
 			timeout = time.time() + reboot_timeout
 			while time.time() < timeout:
-				pingable = os.system("fping -q " + hostname)
+				pingable = os.system("fping -q " + hostname + "2>/dev/null")
 				if pingable == 0:
 					print(hostname + " is back online. Checking status")
 					host_up = True
