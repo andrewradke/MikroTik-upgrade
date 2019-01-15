@@ -327,10 +327,7 @@ for hostname in args.hosts:
 						print(bcolors.OKGREEN, end='')
 					print("{} RouterOS successfully upgraded. Version now {}".format(hostname,version))
 					if sys.stdout.isatty():
-						print(bcolors.FAIL, end='')
-
-
-
+						print(bcolors.ENDC, end='')
 
 			else:
 				if sys.stdout.isatty():
