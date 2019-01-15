@@ -245,7 +245,7 @@ for hostname in args.hosts:
 			host_up = False
 			timeout = time.time() + reboot_timeout
 			while time.time() < timeout:
-				pingable = os.system("fping -q " + hostname + "2>/dev/null")
+				pingable = os.system("fping -q " + hostname + " 2>/dev/null")
 				if pingable == 0:
 					print(hostname + " is back online. Checking status")
 					host_up = True
@@ -261,7 +261,8 @@ for hostname in args.hosts:
 			if host_up:
 				reboot_time = time.time() - reboot_time
 				if args.verbose and args.verbose >= 2:
-					print("reboot took {:.1f} seconds.".format(reboot_time))
+					print("Reboot took {:.1f} seconds.".format(reboot_time))
+				time.sleep(5)	# Wait 5 seconds for the device to fully boot
 
 				version	= ""
 				uptime	= ""
@@ -401,6 +402,7 @@ for hostname in args.hosts:
 				if args.verbose:
 					print("rebooting in 5 seconds.")
 				time.sleep(5)
+				print("Rebooting {}".format(hostname))
 				stdin, stdout, stderr = SSHClient.exec_command('/system reboot')
 			else:
 				print(bcolors.OKBLUE + "NOOP: would upgrade routerboard and reboot" + bcolors.ENDC)
@@ -415,7 +417,7 @@ for hostname in args.hosts:
 			host_up = False
 			timeout = time.time() + reboot_timeout
 			while time.time() < timeout:
-				pingable = os.system("fping -q " + hostname + "2>/dev/null")
+				pingable = os.system("fping -q " + hostname + " 2>/dev/null")
 				if pingable == 0:
 					print(hostname + " is back online. Checking status")
 					host_up = True
@@ -432,6 +434,7 @@ for hostname in args.hosts:
 				reboot_time = time.time() - reboot_time
 				if args.verbose:
 					print("Reboot took {:.1f} seconds.".format(reboot_time))
+				time.sleep(5)	# Wait 5 seconds for the device to fully boot
 
 				version	= ""
 				uptime	= ""
