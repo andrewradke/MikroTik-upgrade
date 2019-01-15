@@ -250,7 +250,7 @@ for hostname in args.hosts:
 					host_up = True
 					break
 				if sys.stdout.isatty():
-					print('\r{:.0f} seconds since reboot...     '.format(time.time() + reboot_timeout - timeout), end='', flush=True)
+					print('\r{:.0f} seconds since reboot...'.format(time.time() - reboot_time), end='', flush=True)
 			if sys.stdout.isatty():
 				print('\r', end='')
 				for i in range(0,shutil.get_terminal_size().columns):
@@ -419,7 +419,7 @@ for hostname in args.hosts:
 					host_up = True
 					break
 				if sys.stdout.isatty():
-					print('\r{:.0f} seconds since reboot...     '.format(time.time() + reboot_timeout - timeout), end='', flush=True)
+					print('\r{:.0f} seconds since reboot...'.format(time.time() - reboot_time), end='', flush=True)
 			if sys.stdout.isatty():
 				print('\r', end='')
 				for i in range(0,shutil.get_terminal_size().columns):
