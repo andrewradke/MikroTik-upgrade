@@ -196,9 +196,9 @@ for hostname in args.hosts:
 
 		filename = "routeros-" + architecture_name + "-" + args.version + ".npk"
 		if not os.path.isfile(filename) and args.download:
+			fullurl = baseurl + "/" + args.version + "/" + filename
 			print("Downloading RouterOS image file {}".format(fullurl))
 			import urllib.request
-			fullurl = baseurl + "/" + args.version + "/" + filename
 			try:
 				if sys.stdout.isatty():
 					urllib.request.urlretrieve(fullurl, filename, reporthook=reporthook)
