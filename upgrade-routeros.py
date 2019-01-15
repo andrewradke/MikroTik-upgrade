@@ -28,14 +28,14 @@ parser.add_argument('hosts', metavar='HOST', type=str, nargs='+', help='RouterOS
 args = parser.parse_args()
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
+	UNDERLINE = '\033[4m'
 
 
 pingable = os.system("fping -q localhost")
@@ -93,11 +93,11 @@ MikroTik_version_regex = re.compile('^([^ ]*)')
 
 # Define progress callback that prints the current percentage completed for the file with SCP
 def progress(filename, size, sent):
-    sys.stdout.write("%s\'s progress: %.2f%%   \r" % (filename, float(sent)/float(size)*100) )
+	sys.stdout.write("%s\'s progress: %.2f%%   \r" % (filename, float(sent)/float(size)*100) )
 
 # Define reporthook that prints the current percentage completed for the file download
 def reporthook(chunknum, maxchunksize, totalsize):
-    sys.stdout.write("%i of %i progress: %.2f%%   \r" % ((chunknum*maxchunksize), totalsize, float(chunknum*maxchunksize)/float(totalsize)*100) )
+	sys.stdout.write("%i of %i progress: %.2f%%   \r" % ((chunknum*maxchunksize), totalsize, float(chunknum*maxchunksize)/float(totalsize)*100) )
 
 
 for hostname in args.hosts:
@@ -250,8 +250,14 @@ for hostname in args.hosts:
 					print(hostname + " is back online. Checking status")
 					host_up = True
 					break
-				if args.verbose:
-					print('.', end='', flush=True)
+				if sys.stdout.isatty():
+					print('\r{:.0f} seconds since reboot...     \r'.format(time.time() + reboot_timeout - timeout), end='', flush=True)
+			if sys.stdout.isatty():
+				print('\r', end='')
+				for i in range(0,shutil.get_terminal_size().columns):
+					print(' ', end='')
+				print('\r', end='')
+
 			if args.verbose:
 				print('\r', end='')
 				for i in range(0,shutil.get_terminal_size().columns):
@@ -419,8 +425,14 @@ for hostname in args.hosts:
 					print(hostname + " is back online. Checking status")
 					host_up = True
 					break
-				if args.verbose:
-					print('.', end='', flush=True)
+				if sys.stdout.isatty():
+					print('\r{:.0f} seconds since reboot...     '.format(time.time() + reboot_timeout - timeout), end='', flush=True)
+			if sys.stdout.isatty():
+				print('\r', end='')
+				for i in range(0,shutil.get_terminal_size().columns):
+					print(' ', end='')
+				print('\r', end='')
+
 			if args.verbose:
 				print('\r', end='')
 				for i in range(0,shutil.get_terminal_size().columns):
