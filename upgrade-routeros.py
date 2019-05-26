@@ -122,12 +122,23 @@ for hostname in args.hosts:
 	# Add the users known_hosts
 	SSHClient.load_system_host_keys()
 
-	try:
-		SSHClient.connect(hostname, username=username, timeout=timeout)
-	except paramiko.SSHException as e:
+	connected = False
+	retries   = 0
+	while not connected:
+		try:
+			SSHClient.connect(hostname, username=username, timeout=timeout)
+			connected = True
+			break
+		except:
+			if retries > 3:
+				break
+			print(bcolors.WARNING + "SSH connection failed. Retrying." + bcolors.ENDC)
+			retries += 1
+			time.sleep(retries)
+	if not connected:
 		if sys.stdout.isatty():
 			print(bcolors.FAIL, end='')
-		print("ERROR: SSH connection failed with '{}'. Updates to ALL FURTHER devices cancelled!".format(e))
+		print("ERROR: SSH connection failed. Updates to ALL FURTHER devices cancelled!")
 		if sys.stdout.isatty():
 			print(bcolors.ENDC, end='')
 		SSHClient.close()
@@ -216,7 +227,7 @@ for hostname in args.hosts:
 
 		if os.path.isfile(filename):
 			if sys.stdout.isatty():
-				SCPClient = scp.SCPClient(SSHClient.get_transport(), progress=progress)
+				SCPClient = scp.SCPClient(SSHClient.get_transport(), progress=progress, socket_timeout=60)
 			else:
 				SCPClient = scp.SCPClient(SSHClient.get_transport())
 			if not args.noop:
