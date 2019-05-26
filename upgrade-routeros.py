@@ -175,14 +175,17 @@ for hostname in args.hosts:
 		SSHClient.close()
 		continue
 
-	if (bad_blocks == ""):
-		print("Failed to get current bad-clocks. Skipping upgrade.")
-		SSHClient.close()
-		continue
-	if (bad_blocks != "0%"):
-		print('bad-blocks of {} is not 0%. Skipping upgrade.'.format(bad_blocks))
-		SSHClient.close()
-		continue
+	if (board_name == "CHR"):
+		architecture_name = "x86"
+	else:
+		if (bad_blocks == ""):
+			print("Failed to get current bad-blocks. Skipping upgrade.")
+			SSHClient.close()
+			continue
+		if (bad_blocks != "0%"):
+			print('bad-blocks of {} is not 0%. Skipping upgrade.'.format(bad_blocks))
+			SSHClient.close()
+			continue
 
 	if (CurVersion < NewVersion):
 		action = "Upgrading"
@@ -345,7 +348,7 @@ for hostname in args.hosts:
 	else:
 		print("RouterOS version already {}".format(version))
 
-	if args.firmware:
+	if args.firmware and board_name != "CHR":
 		if args.verbose:
 			print("Checking firmware version".format(hostname))
 		CurrentFirmware = ""
