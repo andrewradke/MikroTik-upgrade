@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-V', '--version',   required=True,		help='RouterOS version to install')
 parser.add_argument('-d', '--downgrade', action="store_true",	help='Allow downgrades, default: false')
 parser.add_argument('-t', '--timeout',				help='SSH timeout in seconds, default: 10')
+parser.add_argument('-s', '--sshstop',   action="store_true",	help='Stop upgrades of further devices if SSH fails on initial connection, default: false')
 parser.add_argument('-r', '--reboot_timeout',			help='Timeout after reboot before upgrade considered failed, default: 180')
 parser.add_argument('-u', '--username',				help='Username for access to RouterOS, default: local username')
 parser.add_argument('-b', '--baseurl',				help='Base URL for retrieving RouterOS images if needed, default: https://download.mikrotik.com/routeros/')
@@ -138,10 +139,14 @@ for hostname in args.hosts:
 	if not connected:
 		if sys.stdout.isatty():
 			print(bcolors.FAIL, end='')
-		print("ERROR: SSH connection failed. Updates to ALL FURTHER devices cancelled!")
+		print("ERROR: SSH connection failed.")
+		if args.sshstop:
+			print("Updates to ALL FURTHER devices cancelled!")
 		if sys.stdout.isatty():
 			print(bcolors.ENDC, end='')
 		SSHClient.close()
+		if not args.sshstop:
+			continue
 		if not args.noop:
 			sys.exit(2)
 		else:
