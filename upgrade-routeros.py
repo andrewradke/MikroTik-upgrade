@@ -277,10 +277,8 @@ for hostname in args.hosts:
 				print('\r', end='')
 
 			if host_up:
-				print(hostname + " is back online. Checking status")
 				reboot_time = time.time() - reboot_time
-				if args.verbose and args.verbose >= 2:
-					print("Reboot took {:.1f} seconds.".format(reboot_time))
+				print('{s} is back online after {:.0f} seconds. Checking status'.format(hostname, reboot_time), end='', flush=True)
 				time.sleep(5)	# Wait 5 seconds for the device to fully boot
 
 				version	= ""
@@ -446,10 +444,8 @@ for hostname in args.hosts:
 				print('\r', end='')
 
 			if host_up:
-				print(hostname + " is back online. Checking status")
 				reboot_time = time.time() - reboot_time
-				if args.verbose:
-					print("Reboot took {:.1f} seconds.".format(reboot_time))
+				print('{s} is back online after {:.0f} seconds. Checking status'.format(hostname, reboot_time), end='', flush=True)
 				time.sleep(5)	# Wait 5 seconds for the device to fully boot
 
 				version	= ""
