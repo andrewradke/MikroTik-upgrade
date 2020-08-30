@@ -18,6 +18,7 @@ parser.add_argument('-V', '--version',   required=True,		help='RouterOS version 
 parser.add_argument('-d', '--downgrade', action="store_true",	help='Allow downgrades, default: false')
 parser.add_argument('-t', '--timeout',				help='SSH timeout in seconds, default: 10')
 parser.add_argument('-s', '--sshstop',   action="store_true",	help='Stop upgrades of further devices if SSH fails on initial connection, default: false')
+parser.add_argument('-R', '--sshretries',			help='SSH retries, default: 3')
 parser.add_argument('-r', '--reboot_timeout',			help='Timeout after reboot before upgrade considered failed, default: 180')
 parser.add_argument('-u', '--username',				help='Username for access to RouterOS, default: local username')
 parser.add_argument('-b', '--baseurl',				help='Base URL for retrieving RouterOS images if needed, default: https://download.mikrotik.com/routeros/')
@@ -53,6 +54,11 @@ if args.timeout:
 	timeout = args.timeout
 else:
 	timeout = 10
+
+if args.sshretries:
+	sshretries = args.sshretries
+else:
+	sshretries = 10
 
 if args.reboot_timeout:
 	reboot_timeout = int(args.reboot_timeout)
@@ -131,7 +137,7 @@ for hostname in args.hosts:
 			connected = True
 			break
 		except:
-			if retries > 3:
+			if retries > sshretries:
 				break
 			print(bcolors.WARNING + "SSH connection failed. Retrying." + bcolors.ENDC)
 			retries += 1
@@ -278,18 +284,29 @@ for hostname in args.hosts:
 
 			if host_up:
 				reboot_time = time.time() - reboot_time
-				print('{s} is back online after {:.0f} seconds. Checking status'.format(hostname, reboot_time), end='', flush=True)
+				print('{} is back online after {:.0f} seconds. Checking status'.format(hostname, reboot_time), end='', flush=True)
 				time.sleep(5)	# Wait 5 seconds for the device to fully boot
 
 				version	= ""
 				uptime	= ""
 				CurVersion = ""
-				try:
-					SSHClient.connect(hostname, username=username, timeout=timeout)
-				except paramiko.SSHException as e:
+				connected = False
+				retries   = 0
+				while not connected:
+					try:
+						SSHClient.connect(hostname, username=username, timeout=timeout)
+						connected = True
+						break
+					except paramiko.SSHException as e:
+						if retries > sshretries:
+							break
+						print(bcolors.WARNING + "SSH connection failed with '{}'. Retrying.".format(e) + bcolors.ENDC)
+						retries += 1
+						time.sleep(retries)
+				if not connected:
 					if sys.stdout.isatty():
 						print(bcolors.FAIL, end='')
-					print("ERROR: SSH connection failed with '{}'. Updates to ALL FURTHER devices cancelled!".format(e))
+					print("ERROR: SSH connection failed. Updates to ALL FURTHER devices cancelled!")
 					if sys.stdout.isatty():
 						print(bcolors.ENDC, end='')
 					SSHClient.close()
@@ -367,12 +384,23 @@ for hostname in args.hosts:
 			print("Checking firmware version".format(hostname))
 		CurrentFirmware = ""
 		UpgradeFirmware = ""
-		try:
-			SSHClient.connect(hostname, username=username, timeout=timeout)
-		except paramiko.SSHException as e:
+		connected = False
+		retries   = 0
+		while not connected:
+			try:
+				SSHClient.connect(hostname, username=username, timeout=timeout)
+				connected = True
+				break
+			except paramiko.SSHException as e:
+				if retries > sshretries:
+					break
+				print(bcolors.WARNING + "SSH connection failed with '{}'. Retrying.".format(e) + bcolors.ENDC)
+				retries += 1
+				time.sleep(retries)
+		if not connected:
 			if sys.stdout.isatty():
 				print(bcolors.FAIL, end='')
-			print("ERROR: SSH connection failed with '{}'. Updates to ALL FURTHER devices cancelled!".format(e))
+			print("ERROR: SSH connection failed. Updates to ALL FURTHER devices cancelled!")
 			if sys.stdout.isatty():
 				print(bcolors.ENDC, end='')
 			SSHClient.close()
@@ -445,18 +473,29 @@ for hostname in args.hosts:
 
 			if host_up:
 				reboot_time = time.time() - reboot_time
-				print('{s} is back online after {:.0f} seconds. Checking status'.format(hostname, reboot_time), end='', flush=True)
+				print('{} is back online after {:.0f} seconds. Checking status'.format(hostname, reboot_time), end='', flush=True)
 				time.sleep(5)	# Wait 5 seconds for the device to fully boot
 
 				version	= ""
 				uptime	= ""
 				CurVersion = ""
-				try:
-					SSHClient.connect(hostname, username=username, timeout=timeout)
-				except paramiko.SSHException as e:
+				connected = False
+				retries   = 0
+				while not connected:
+					try:
+						SSHClient.connect(hostname, username=username, timeout=timeout)
+						connected = True
+						break
+					except paramiko.SSHException as e:
+						if retries > sshretries:
+							break
+						print(bcolors.WARNING + "SSH connection failed with '{}'. Retrying.".format(e) + bcolors.ENDC)
+						retries += 1
+						time.sleep(retries)
+				if not connected:
 					if sys.stdout.isatty():
 						print(bcolors.FAIL, end='')
-					print("ERROR: SSH connection failed with '{}'. Updates to ALL FURTHER devices cancelled!".format(e))
+					print("ERROR: SSH connection failed. Updates to ALL FURTHER devices cancelled!")
 					if sys.stdout.isatty():
 						print(bcolors.ENDC, end='')
 					SSHClient.close()
