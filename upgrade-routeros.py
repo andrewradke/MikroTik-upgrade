@@ -223,7 +223,10 @@ for hostname in args.hosts:
 	if action:
 		print("{} RouterOS version from {} to {}".format(action,version,args.version))
 
-		filename = "routeros-" + architecture_name + "-" + args.version + ".npk"
+		if packaging.version.parse(args.version) >= packaging.version.parse("7"):
+			filename = "routeros-" + args.version + "-" + architecture_name + ".npk"
+		else:
+			filename = "routeros-" + architecture_name + "-" + args.version + ".npk"
 		if not os.path.isfile(filename) and args.download:
 			fullurl = baseurl + "/" + args.version + "/" + filename
 			print("Downloading RouterOS image file {}".format(fullurl))
